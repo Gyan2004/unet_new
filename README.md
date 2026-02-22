@@ -23,9 +23,24 @@ Setup:
 pip install -r requirements.txt
 ```
 
+Model Weights:
+**Important**: The file `best_model.weights.h5` (127.86 MB) is required but not included in this repo due to GitHub's file size limits.
+
+To use this project, place the weights file in the `models/` directory:
+```
+models/
+  ├── best_model.weights.h5   ← Place your weights file here
+  └── model_architecture.py
+```
+
+If you don't have the weights file:
+- Download from your Google Colab export / backup location
+- Or train the model: `python src/train.py` (requires training data in `data/train/` and `data/val/`)
+
 How to run:
-- Evaluate on test set: `python src/evaluate.py`
-- Predict on a single image: `python src/predict.py`
+- **Test the model**: `python test_model.py` (requires weights file)
+- **Evaluate on test set**: `python src/evaluate.py` (requires test data in `data/test/`)
+- **Predict on a single image**: `python src/predict.py` (requires weights file)
 
 Architecture:
 - Conv2D (32 filters) + MaxPooling
