@@ -55,6 +55,12 @@ def main():
     print(f"   {'-' * 56}")
     model.summary()
     
+    # Print class information
+    print(f"\n6. Classification Classes:")
+    print(f"   {'-' * 56}")
+    for idx, cls in enumerate(CLASS_NAMES):
+        print(f"   Class {idx}: {cls}")
+    
     print(f"\n{'=' * 60}")
     print("✓ All tests passed! Model is ready for evaluation.")
     print(f"{'=' * 60}\n")

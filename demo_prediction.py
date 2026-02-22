@@ -40,10 +40,9 @@ def create_synthetic_xray(image_type="normal"):
         label = "NORMAL"
         
     elif image_type == "pneumonia":
-        # Create pneumonia-like appearance with abnormal patterns
+        # Create pneumonia-like appearance with consolidation patterns
         img = np.ones((IMAGE_SIZE[0], IMAGE_SIZE[1], 3), dtype=np.float32) * 0.35
         
-        # Lungs with abnormal opacities
         center_x, center_y = IMAGE_SIZE[0] // 2, IMAGE_SIZE[1] // 2
         y, x = np.ogrid[:IMAGE_SIZE[0], :IMAGE_SIZE[1]]
         
@@ -53,7 +52,7 @@ def create_synthetic_xray(image_type="normal"):
         img[lung_left] = [0.15, 0.15, 0.15]
         img[lung_right] = [0.15, 0.15, 0.15]
         
-        # Add pneumonia-like opacities (bright spots)
+        # Pneumonia consolidation (bright opacities)
         for _ in range(8):
             cy = np.random.randint(80, 144)
             cx = np.random.randint(80, 144)
@@ -62,6 +61,53 @@ def create_synthetic_xray(image_type="normal"):
             img[circle_mask] = [0.5, 0.5, 0.5]
         
         label = "PNEUMONIA"
+    
+    elif image_type == "covid":
+        # COVID-19: bilateral opacities, ground-glass patterns
+        img = np.ones((IMAGE_SIZE[0], IMAGE_SIZE[1], 3), dtype=np.float32) * 0.4
+        
+        center_x, center_y = IMAGE_SIZE[0] // 2, IMAGE_SIZE[1] // 2
+        y, x = np.ogrid[:IMAGE_SIZE[0], :IMAGE_SIZE[1]]
+        
+        # Lungs
+        lung_left = ((x - center_y + 40)**2 / 1500 + (y - center_x)**2 / 2000) < 1
+        lung_right = ((x - center_y - 40)**2 / 1500 + (y - center_x)**2 / 2000) < 1
+        
+        img[lung_left] = [0.25, 0.25, 0.25]
+        img[lung_right] = [0.25, 0.25, 0.25]
+        
+        # COVID bilateral ground-glass opacities
+        for i in range(20):
+            cy = np.random.randint(50, 170)
+            cx = np.random.randint(60, 180)
+            radius = np.random.randint(8, 20)
+            circle_mask = (y - cy)**2 + (x - cx)**2 < radius**2
+            img[circle_mask] = [0.45, 0.45, 0.45]
+        
+        label = "COVID19"
+    
+    elif image_type == "tuberculosis":
+        # TB: cavitary lesions and upper lobe involvement
+        img = np.ones((IMAGE_SIZE[0], IMAGE_SIZE[1], 3), dtype=np.float32) * 0.35
+        
+        center_x, center_y = IMAGE_SIZE[0] // 2, IMAGE_SIZE[1] // 2
+        y, x = np.ogrid[:IMAGE_SIZE[0], :IMAGE_SIZE[1]]
+        
+        lung_left = ((x - center_y + 40)**2 / 1500 + (y - center_x)**2 / 2000) < 1
+        lung_right = ((x - center_y - 40)**2 / 1500 + (y - center_x)**2 / 2000) < 1
+        
+        img[lung_left] = [0.2, 0.2, 0.2]
+        img[lung_right] = [0.2, 0.2, 0.2]
+        
+        # TB cavities (irregular patterns, upper lobes)
+        for i in range(5):
+            cy = np.random.randint(40, 100)  # Upper lobes
+            cx = np.random.randint(60, 180)
+            radius = np.random.randint(10, 25)
+            circle_mask = (y - cy)**2 + (x - cx)**2 < radius**2
+            img[circle_mask] = [0.55, 0.55, 0.55]
+        
+        label = "TUBERCULOSIS"
     
     # Normalize
     img = np.clip(img, 0, 1)
@@ -86,11 +132,12 @@ def main():
     print(f"   ✓ Loaded: {model.count_params():,} parameters")
     
     # Class labels (4-class model)
-    class_names = ['Class_0', 'Class_1', 'Class_2', 'Class_3']
-    colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A']
+    from config import CLASS_NAMES, CLASS_COLORS
+    class_names = CLASS_NAMES
+    colors = CLASS_COLORS
     
-    # Create test cases
-    test_cases = ["normal", "pneumonia"]
+    # Create test cases for all 4 classes
+    test_cases = ["normal", "pneumonia", "covid", "tuberculosis"]
     
     print(f"\n{'─' * 80}")
     print("MAKING PREDICTIONS ON TEST IMAGES")

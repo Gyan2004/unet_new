@@ -9,6 +9,7 @@ from models.model_architecture import build_model
 from config import *
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import numpy as np
 
 def main():
     test_datagen = ImageDataGenerator(rescale=1./255)
@@ -28,6 +29,8 @@ def main():
 
     print("Test Loss:", results[0])
     print("Test Accuracy:", results[1])
+    print(f"\nClass Names: {CLASS_NAMES}")
+    print(f"Model evaluated on classes: {', '.join(CLASS_NAMES)}")
 
 if __name__ == '__main__':
     main()
